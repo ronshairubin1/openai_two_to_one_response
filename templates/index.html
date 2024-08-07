@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            background-color: #f5f5f5;
+            overflow-y: scroll;
+        }
+        .input-container {
+            display: flex;
+            padding: 10px;
+            background-color: #ddd;
+        }
+        .input-container textarea {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container" id="chat-container">
+        <div id="chat-content"></div>
+    </div>
+    <div class="input-container">
+        <textarea id="user-input" rows="3" placeholder="Type your message here..."></textarea>
+    </div>
+    <script>
+        document.getElementById('user-input').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            const chatContent = document.getElementById('chat-content');
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = 'Human: ' + userInput;
+            chatContent.appendChild(messageDiv);
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ conversation_history: [], input: userInput }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const response1Div = document.createElement('div');
+                response1Div.textContent = 'AI Response 1: ' + data.response1;
+                chatContent.appendChild(response1Div);
+
+                const response2Div = document.createElement('div');
+                response2Div.textContent = 'AI Response 2: ' + data.response2;
+                chatContent.appendChild(response2Div);
+
+                const evaluationDiv = document.createElement('div');
+                evaluationDiv.textContent = 'Evaluation: ' + data.evaluation;
+                chatContent.appendChild(evaluationDiv);
+
+                const betterResponseDiv = document.createElement('div');
+                betterResponseDiv.textContent = 'Better Response: ' + data.better_response;
+                chatContent.appendChild(betterResponseDiv);
+
+                document.getElementById('user-input').value = '';
+                chatContent.scrollTop = chatContent.scrollHeight;
+            })
+            .catch(error => {
+                const errorDiv = document.createElement('div');
+                errorDiv.textContent = 'Error: ' + error.message;
+                chatContent.appendChild(errorDiv);
+            });
+        }
+    </script>
+</body>
+</html>

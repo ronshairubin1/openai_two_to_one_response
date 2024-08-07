@@ -1,0 +1,4 @@
+New session started at 2024-08-07 08:12:54.094313
+
+
+Error: 'OpenAI' object has no attribute 'ChatCompletion'
